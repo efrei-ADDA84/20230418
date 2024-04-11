@@ -8,6 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # Installez les dépendances Python
+RUN pip install -r requirements.txt
 
 # Définissez les variables d'environnement
 ENV OPENWEATHER_API_KEY="04e446c0d5e2ab6be2b08792f7addfec"
