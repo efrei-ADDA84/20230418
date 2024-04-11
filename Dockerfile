@@ -10,6 +10,9 @@ COPY . /app
 # Installez les dépendances Python
 RUN pip install -r requirements.txt
 
+# Définissez les variables d'environnement
+ENV API_KEY="04e446c0d5e2ab6be2b08792f7addfec"
+
 # Exposez le port si votre application écoute sur un port spécifique
 # EXPOSE 8080
 
