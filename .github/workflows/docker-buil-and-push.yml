@@ -23,6 +23,7 @@ jobs:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
         run: |
           echo "${{ secrets.AZURE_CREDENTIALS }}" > az_credentials.json
+          echo -e "${{ secrets.AZURE_CREDENTIALS }}"
           export AZURE_CLIENT_ID=$(jq -r '.clientId' az_credentials.json)
           export AZURE_CLIENT_SECRET=$(jq -r '.clientSecret' az_credentials.json)
           export AZURE_TENANT_ID=$(jq -r '.tenantId' az_credentials.json)
