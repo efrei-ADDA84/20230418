@@ -14,7 +14,7 @@ def get_weather():
 
     api_key = os.environ.get('API_KEY')
     if not api_key:
-        return jsonify({'error': 'API key not found. Set OPENWEATHER_API_KEY environment variable.'}), 500
+        return jsonify({'error': 'API key not found. Set API_KEY environment variable.'}), 500
 
     url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}"
     response = requests.get(url)
@@ -26,5 +26,5 @@ def get_weather():
     return jsonify(data), 200
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=8081)
 
