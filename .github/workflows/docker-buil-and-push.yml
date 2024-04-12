@@ -35,17 +35,17 @@ jobs:
           az login --service-principal -u "$client_id" -p "$client_secret" --tenant "$tenant_id"
       - name: Connect to Azure Container Registry
         run: |
-          az acr login --name ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          az acr login --name $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}")
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io/20230418 .
-          docker login ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io/20230418
+          docker build -t $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}").azurecr.io/20230418 .
+          docker login $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}").azurecr.io -u $(echo -e "${{ secrets.REGISTRY_USERNAME}}") -p $(echo -e "${{ secrets.REGISTRY_PASSWORD}}")
+          docker push $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}").azurecr.io/20230418
 
       - name: Deploy to Azure Container Instance
         run: |
-          az container create --resource-group ${{ secrets.RESOURCE_GROUP }} --name 20230418 --image ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io/20230418 --cpu 1 --memory 2 --ports 8080
+          az container create --resource-group $(echo -e "${{ secrets.RESOURCE_GROUP }}") --name 20230418 --image $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}")azurecr.io/20230418 --cpu 1 --memory 2 --ports 8080
 
 
 
