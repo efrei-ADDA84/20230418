@@ -23,26 +23,5 @@ jobs:
           # Extraire le contenu du secret Azure Credentials et le stocker dans une variable
           AZURE_CREDENTIALS=$(echo -e "${{ secrets.AZURE_CREDENTIALS }}")
           
-          # Extraire les informations individuelles à l'aide de jq
-          clientId=$(echo "$AZURE_CREDENTIALS" | jq -r '.clientId')
-          clientSecret=$(echo "$AZURE_CREDENTIALS" | jq -r '.clientSecret')
-          subscriptionId=$(echo "$AZURE_CREDENTIALS" | jq -r '.subscriptionId')
-          tenantId=$(echo "$AZURE_CREDENTIALS" | jq -r '.tenantId')
-          activeDirectoryEndpointUrl=$(echo "$AZURE_CREDENTIALS" | jq -r '.activeDirectoryEndpointUrl')
-          resourceManagerEndpointUrl=$(echo "$AZURE_CREDENTIALS" | jq -r '.resourceManagerEndpointUrl')
-          activeDirectoryGraphResourceId=$(echo "$AZURE_CREDENTIALS" | jq -r '.activeDirectoryGraphResourceId')
-          sqlManagementEndpointUrl=$(echo "$AZURE_CREDENTIALS" | jq -r '.sqlManagementEndpointUrl')
-          galleryEndpointUrl=$(echo "$AZURE_CREDENTIALS" | jq -r '.galleryEndpointUrl')
-          managementEndpointUrl=$(echo "$AZURE_CREDENTIALS" | jq -r '.managementEndpointUrl')
           
-          # Afficher les informations extraites
-          echo "clientId: $clientId"
-          echo "clientSecret: $clientSecret"
-          echo "subscriptionId: $subscriptionId"
-          echo "tenantId: $tenantId"
-          echo "activeDirectoryEndpointUrl: $activeDirectoryEndpointUrl"
-          echo "resourceManagerEndpointUrl: $resourceManagerEndpointUrl"
-          echo "activeDirectoryGraphResourceId: $activeDirectoryGraphResourceId"
-          echo "sqlManagementEndpointUrl: $sqlManagementEndpointUrl"
-          echo "galleryEndpointUrl: $galleryEndpointUrl"
-          echo "managementEndpointUrl: $managementEndpointUrl"
+          echo "$AZURE_CREDENTIALS"
