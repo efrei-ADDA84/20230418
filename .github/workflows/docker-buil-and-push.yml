@@ -26,14 +26,28 @@ jobs:
           # Extraire les valeurs des clés à l'aide de grep, cut et awk
           client_id=$(echo "${{ secrets.AZURE_CREDENTIALS }}" | grep -o 'clientId: [^,]*' | cut -d ' ' -f 2)
           client_secret=$(echo "${{ secrets.AZURE_CREDENTIALS }}" | grep -o 'clientSecret: [^,]*' | cut -d ' ' -f 2)
-          subscription_id=$(echo "${{ secrets.AZURE_CREDENTIALS }}" | grep -o 'subscriptionId: [^,]*' | cut -d ' ' -f 2)
           tenant_id=$(echo "${{ secrets.AZURE_CREDENTIALS }}" | grep -o 'tenantId: [^,]*' | cut -d ' ' -f 2)
           
           # Afficher les valeurs des clés
           echo "Client ID: $client_id"
           echo "Client Secret: $client_secret"
-          echo "Subscription ID: $subscription_id"
           echo "Tenant ID: $tenant_id"
+          az login --service-principal -u "$client_id" -p "$client_secret" --tenant "$tenant_id"
+      - name: Connect to Azure Container Registry
+        run: |
+          az acr login --name ${{ secrets.REGISTRY_LOGIN_SERVER }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io/20230418 .
+          docker login ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io/20230418
+
+      - name: Deploy to Azure Container Instance
+        run: |
+          az container create --resource-group ${{ secrets.RESOURCE_GROUP }} --name 20230418 --image ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io/20230418 --cpu 1 --memory 2 --ports 8080
+
+
 
 
 
