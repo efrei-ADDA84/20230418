@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Deploy to Azure Container Instance
 
 on:
   push:
@@ -6,17 +6,19 @@ on:
       - master
 
 jobs:
-  build-and-push:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Login to Docker Hub
-        run: docker login --username "${{ secrets.USER_DOCKER }}" --password "${{ secrets.PWD_DOCKER }}"
-
-      - name: Build and push Docker image
+      - name: Install Azure CLI
         run: |
-          docker build -t pedro826/api_weather .
-          docker push pedro826/api_weather
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+      - name: Login to Azure
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+        run: |
+          echo "${{ secrets.AZURE_CREDENTIALS }}" > az_credentials.json
