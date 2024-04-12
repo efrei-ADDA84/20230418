@@ -22,6 +22,6 @@ jobs:
         run: |
           # Extraire le contenu du secret Azure Credentials et le stocker dans une variable
           AZURE_CREDENTIALS=$(echo -e "${{ secrets.AZURE_CREDENTIALS }}")
+          echo "$AZURE_CREDENTIALS" > az_credentials.json
           
-          
-          echo "$AZURE_CREDENTIALS"
+          echo "$az_credentials.json"
