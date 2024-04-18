@@ -39,6 +39,7 @@ jobs:
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
           name: 20230418
+          ports: 8081
           location: 'germany north'
 
 
