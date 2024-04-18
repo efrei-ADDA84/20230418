@@ -27,18 +27,15 @@ jobs:
 
       - name: Build and push image
         run: |
-          docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io/20230418:v1
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io/20230418:v1
+          docker build . -t $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}").azurecr.io/20230418:v1
+          docker push $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}").azurecr.io/20230418:v1
 
-      - name: Deploy to Azure Container Instance
-        run: |
-          az container create --resource-group $(echo -e "${{ secrets.RESOURCE_GROUP }}") --name 20230418 --image $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}")azurecr.io/20230418 --cpu 1 --memory 2 --ports 8080
       - name: Deploy to Azure Container Instances
         uses: azure/aci-deploy@v1
         with:
           resource-group: ${{ secrets.RESOURCE_GROUP }}
           dns-name-label: devops-20230418
-          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io/20230418:v1
+          image: $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}").azurecr.io/20230418:v1
           cpu: 1
           memory: 0.1
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
