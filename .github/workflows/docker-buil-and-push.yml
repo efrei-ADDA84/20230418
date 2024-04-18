@@ -11,49 +11,40 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v1
 
-      - name: Install Azure CLI and jq
-        run: |
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-          apt-get install jq | sudo bash
+      - name: azure login
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Extract Azure credentials
-        run: |
-          # Extraire le contenu du secret Azure Credentials et le stocker dans une variable
-          AZURE_CREDENTIALS=$(echo -e "${{ secrets.AZURE_CREDENTIALS }}")
-          
-          # Extraire les valeurs des clés à l'aide de grep, cut et awk
-          client_id=$(echo "${{ secrets.AZURE_CREDENTIALS }}" | grep -o 'clientId: [^,]*' | cut -d ' ' -f 2)
-          client_secret=$(echo "${{ secrets.AZURE_CREDENTIALS }}" | grep -o 'clientSecret: [^,]*' | cut -d ' ' -f 2)
-          tenant_id=$(echo "${{ secrets.AZURE_CREDENTIALS }}" | grep -o 'tenantId: [^,]*' | cut -d ' ' -f 2)
-          
-          # Afficher les valeurs des clés
-          echo "Client ID: $client_id"
-          echo "Client Secret: $client_secret"
-          echo "Tenant ID: $tenant_id"
+      - name: login Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Login on Azure
-        run: |    
-          az login --service-principal -u "$client_id" -p "$client_secret" --tenant "$tenant_id"
-      - name: Connect to Azure Container Registry
+      - name: Build and push image
         run: |
-          az acr login --name $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}")
-
-      - name: Build image
-        run: |
-          docker build -t $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}").azurecr.io/20230418 .
-      - name: Docker login
-        run: |    
-          docker login $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}").azurecr.io -u $(echo -e "${{ secrets.REGISTRY_USERNAME}}") -p $(echo -e "${{ secrets.REGISTRY_PASSWORD}}")
-      - name: Docker push
-        run: |
-          docker push $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}").azurecr.io/20230418
+          docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io/20230418:v1
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io/20230418:v1
 
       - name: Deploy to Azure Container Instance
         run: |
           az container create --resource-group $(echo -e "${{ secrets.RESOURCE_GROUP }}") --name 20230418 --image $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}")azurecr.io/20230418 --cpu 1 --memory 2 --ports 8080
-
+      - name: Deploy to Azure Container Instances
+        uses: azure/aci-deploy@v1
+        with:
+          resource-group: ${{ secrets.RESOURCE_GROUP }}
+          dns-name-label: devops-20230418
+          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}.azurecr.io/20230418:v1
+          cpu: 1
+          memory: 0.1
+          registry-username: ${{ secrets.REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+          name: 20230418
+          location: 'france central'
 
 
 
