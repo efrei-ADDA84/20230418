@@ -32,15 +32,22 @@ jobs:
           echo "Client ID: $client_id"
           echo "Client Secret: $client_secret"
           echo "Tenant ID: $tenant_id"
+
+      - name: Login on Azure
+        run: |    
           az login --service-principal -u "$client_id" -p "$client_secret" --tenant "$tenant_id"
       - name: Connect to Azure Container Registry
         run: |
           az acr login --name $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}")
 
-      - name: Build and push Docker image
+      - name: Build image
         run: |
           docker build -t $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}").azurecr.io/20230418 .
+      - name: Docker login
+        run: |    
           docker login $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}").azurecr.io -u $(echo -e "${{ secrets.REGISTRY_USERNAME}}") -p $(echo -e "${{ secrets.REGISTRY_PASSWORD}}")
+      - name: Docker push
+        run: |
           docker push $(echo -e "${{ secrets.REGISTRY_LOGIN_SERVER }}").azurecr.io/20230418
 
       - name: Deploy to Azure Container Instance
