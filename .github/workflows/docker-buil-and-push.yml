@@ -41,6 +41,8 @@ jobs:
           name: 20230418
           ports: 8081
           location: 'germany north'
+          environment-variables: |
+            API_KEY=${{ secrets.API_KEY}}
 
 
 
