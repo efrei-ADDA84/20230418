@@ -36,8 +36,6 @@ jobs:
           resource-group: ${{ secrets.RESOURCE_GROUP }}
           dns-name-label: devops-20230418
           image: efreidevops.azurecr.io/20230418:v1
-          cpu: 1
-          memory: 0.1
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
           name: 20230418
