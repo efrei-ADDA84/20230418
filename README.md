@@ -1,22 +1,25 @@
-# Rapport README TP2 - Projet d'API
+# Rapport README TP3 - Projet d'API DEPLOYE SUR UN CONTAINER INSTANCE
 
 ## Introduction
-Ce projet vise à créer une API en utilisant Flask et Python, en se basant sur l'API de OpenWeather. L'objectif est de mettre en place un pipeline d'intégration continue avec GitHub Actions pour construire et pousser l'API sur DockerHub.
+Ce projet vise à créer une API en utilisant Flask et Python, en se basant sur l'API de OpenWeather, de mettre à disposition une image sur Azure Container Registry et de déployer l'API sur une Azure Container Instance via des GitHub Actions.
 
 ## Contexte
 Au cours du développement de ce projet, j'ai rencontré plusieurs défis que j'ai dû surmonter :
 
-### Secrets GitHub
-Pour sécuriser les identifiants Docker, j'ai choisi de les stocker en tant que secrets GitHub, ce qui permet de les utiliser dans le workflow GitHub Actions sans exposer les informations sensibles.
-
 ### Installation de Docker Desktop
 J'ai rencontré des difficultés lors de l'installation de Docker Desktop sur mon système. Pour continuer à travailler sur le projet, j'ai décidé de passer à une machine virtuelle Linux où j'ai pu installer et exécuter Docker sans problème.
 
-### Problèmes d'authentification GitHub sur Linux
-J'ai également rencontré des problèmes d'authentification GitHub sur Linux. Pour résoudre ce problème, j'ai décidé d'utiliser une clé SSH pour l'authentification avec GitHub. Une fois la clé SSH configurée et ajoutée à mon compte GitHub, j'ai pu pousser et tirer des modifications depuis mon environnement Linux sans problème.
+### le code l'api
+Je me suis servi du code de l'API du TP2 avec juste quelques modifications pour qu'il puisse écouter le port 80 (port d'écoute de ma container registry par défaut) ainsi que toutes les adresses IP du réseau avec ```host="0.0.0.0"```.
+
+### construction du workflow
+La construction du workflow a été la partie la plus compliquée de ce TP car ayant commencé sur de mauvaises bases, je n'arrivais pas à m'authentifier sur Azure via les CREDENTIALS. Mais ensuite avec l'utilisation des GitHub Actions, j'ai pu construire un workflow en parfait accord avec l'énoncé de l'exercice. Nous pouvons noter en passant l'indication de l'API_KEY dans les variables d'environnements du container instance qui nous permet de ne pas l'écrire en dur dans le code.
+
+### deploiement
+Le déploiement se fait à chaque push sur notre branche master de GitHub. Le déploiement final du container instance s'est très bien déroulé et peut être testé via la commande : ```curl "http://devops-20230418.germanynorth.azurecontainer.io/?lat=5.902785&lon=102.754175" ```
 
 ## Découvertes
-Ce projet m'a permis de découvrir plusieurs outils et techniques. J'ai créé une GitHub Action qui se déclenche automatiquement après chaque push sur la branche principale (master). J'ai également déployé une API sur Docker. Le code principal de l'API est fourni ci-dessous :
+Ce projet m'a donné l'occasion de déployer une container instance sur Azure et de pouvoir ainsi accéder à mon API depuis une adresse. Le code principal de l'API est fourni ci-dessous :
 
 ```python
 import os
@@ -47,6 +50,7 @@ def get_weather():
     return jsonify(data), 200
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8081)
+    app.run(debug=True, port=80, host="0.0.0.0")
+
 ```
-Ce code crée une API Flask qui récupère les données météorologiques en fonction des coordonnées de latitude et de longitude fournies en paramètres d'URL. L'API utilise une clé d'API OpenWeather stockée dans une variable d'environnement pour l'authentification.
+Ce code crée une API Flask qui récupère les données météorologiques en fonction des coordonnées de latitude et de longitude fournies en paramètres d'URL. L'API utilise une clé d'API OpenWeather stockée dans une variable d'environnement de mon container instance pour l'authentification.
